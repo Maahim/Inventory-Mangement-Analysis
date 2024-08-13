@@ -1,0 +1,122 @@
+-- What is the total number of products in the inventory?
+SELECT COUNT(*) AS Total_Number_Of_Products 
+FROM Inventory;
+
+-- What is the total number of unique product categories offered by the company?
+SELECT DISTINCT Category 
+FROM Products;
+
+-- What is the average unit price of all products?
+SELECT AVG(Unit_Price) AS Average_Unit_Price 
+FROM Products;
+
+-- What is the total number of orders placed by customers that were delivered?
+SELECT COUNT(*) AS Delivered_Orders 
+FROM Orders 
+WHERE Order_Status = 'Delivered';
+
+-- What is the total number of suppliers associated with the company?
+SELECT COUNT(*) AS Number_Of_Suppliers 
+FROM Supplier;
+
+-- List the product category and name where the unit price is more than 350000
+SELECT Product_Name 
+FROM Products 
+WHERE Unit_Price > 350000;
+
+-- Which product has the highest and lowest unit price?
+SELECT MAX(Unit_Price) AS Highest_Unit_Price, MIN(Unit_Price) AS Lowest_Unit_Price 
+FROM Products;
+
+-- What is the total number of orders placed by customers that are pending?
+SELECT COUNT(*) AS Pending_Orders 
+FROM Orders 
+WHERE Order_Status = 'Pending';
+
+-- How many products belong to the "Electronics" category?
+SELECT COUNT(*) AS Number_Of_Electronics_Category_Product 
+FROM Products 
+WHERE Category = 'Electronics';
+
+-- List the names and contact details of all suppliers.
+SELECT Supplier_Name, Contact_Email, Contact_Phone 
+FROM Supplier;
+
+-- Retrieve the information for products that have a reorder point between 2 and 8.
+SELECT A.Product_Name, A.Category, B.Inventory_ID, B.Reorder_Point 
+FROM Products AS A 
+JOIN Inventory AS B ON A.Product_ID = B.Product_ID 
+WHERE B.Reorder_Point BETWEEN 2 AND 8;
+
+-- What is the total revenue generated from all orders?
+SELECT A.Product_ID, A.Product_Name, B.Quantity * B.Unit_Price AS Total_Amount 
+FROM Products AS A 
+JOIN Order_Items AS B ON A.Product_ID = B.Product_ID;
+
+-- Which product category generates the highest revenue?
+SELECT B.Category, SUM(A.Quantity * A.Unit_Price) AS Total_Revenue 
+FROM Order_Items AS A 
+JOIN Products AS B ON A.Product_ID = B.Product_ID 
+GROUP BY B.Category;
+
+-- How much loss has been incurred on orders?
+SELECT C.Product_Name, C.Category, B.Quantity * B.Unit_Price AS Total_Amount 
+FROM Orders AS A 
+JOIN Order_Items AS B ON A.Order_ID = B.Order_ID 
+JOIN Products AS C ON B.Product_ID = C.Product_ID 
+WHERE A.Order_Status = 'Cancelled';
+
+-- How many orders were placed in August?
+SELECT COUNT(*) AS Orders_Count 
+FROM Orders 
+WHERE MONTH(Order_Date) = 8;
+
+-- Classify each product according to its unit price and assign it to a corresponding pricing category.
+SELECT Product_ID, Product_Name, Unit_Price, 
+    CASE 
+        WHEN Unit_Price > 45000 THEN 'Premium'
+        WHEN Unit_Price > 30000 THEN 'High'
+        WHEN Unit_Price > 15000 THEN 'Medium'
+        ELSE 'Low'
+    END AS Price_Category 
+FROM Products;
+
+-- The management team is interested in understanding the supplier distribution across all products. 
+-- They want to ensure that each product is linked to a supplier and identify if there are any gaps or opportunities for supplier consolidation.
+SELECT A.Product_ID, A.Product_Name, A.Category, B.* 
+FROM Products AS A 
+LEFT JOIN Supplier AS B ON A.Product_ID = B.Product_ID;
+
+-- Find the total sales revenue for each product category and identify categories that have generated more than ₹2,00,000 in sales.
+SELECT A.Category, SUM(B.Quantity * B.Unit_Price) AS Total_Sales 
+FROM Products AS A 
+JOIN Order_Items AS B ON A.Product_ID = B.Product_ID 
+GROUP BY A.Category 
+HAVING SUM(B.Quantity * B.Unit_Price) > 200000;
+
+-- Determine the highest-priced product for each category to assist in competitive analysis and inventory management. 
+WITH CTE1 AS (
+    SELECT Category, Product_Name, Unit_Price, 
+        ROW_NUMBER() OVER (PARTITION BY Category ORDER BY Unit_Price DESC) AS Rank 
+    FROM Products
+)
+SELECT * 
+FROM CTE1 
+WHERE Rank = 1;
+
+-- Identify product categories where the total cumulative quantity on hand is above 250 and the total amount available for each category.
+SELECT A.Category, SUM(B.Quantity_On_Hand) AS Sum_Of_Quantity 
+FROM Products AS A 
+JOIN Inventory AS B ON A.Product_ID = B.Product_ID 
+GROUP BY A.Category 
+HAVING SUM(B.Quantity_On_Hand) > 250;
+
+-- Identify the lowest-priced product for each category to assist in competitive analysis and inventory management.
+WITH CTE1 AS (
+    SELECT Category, Product_Name, Unit_Price, 
+        ROW_NUMBER() OVER (PARTITION BY Category ORDER BY Unit_Price ASC) AS Rank 
+    FROM Products
+)
+SELECT * 
+FROM CTE1 
+WHERE Rank = 1;
