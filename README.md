@@ -25,8 +25,11 @@ An Entity Relationship Diagram (ERD) visually represents the relationships betwe
 **2. Foreign Key Relationships**
 The Products table is linked to the Inventory table through the product_id foreign key. This relationship ensures that each inventory record corresponds to a valid product.
 This relational integrity allows for comprehensive analysis across product information and inventory levels.
-Challenges Faced
-1. Data Consistency
+
+
+**Challenges Faced**
+
+**1. Data Consistency**
 Maintaining data consistency while performing joins and aggregations was challenging. Ensuring that product_id values were correctly aligned between tables was critical for accurate results.
 
 **2. Complex Queries**
@@ -50,4 +53,5 @@ Engaging with complex SQL queries and analysis required a structured approach to
 
 
 **Conclusion**
+
 This project demonstrates the ability to effectively analyze an inventory management system using SQL. By implementing various queries, we can gain insights into product performance, pricing strategies, and inventory management practices. The analysis performed can guide business decisions to optimize stock levels and enhance sales strategies.
